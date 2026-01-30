@@ -1,0 +1,334 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Schools2AI Design System - Modern EdTech Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    /* Core palette - Soft EdTech colors */
+    --background: 0 0% 99%;
+    --foreground: 240 10% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 15%;
+
+    /* Primary - Purple (Brand color) */
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Cyan/Teal */
+    --secondary: 187 96% 42%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Muted - Soft gray with hint of purple */
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+
+    /* Accent - Soft lavender */
+    --accent: 270 50% 96%;
+    --accent-foreground: 262 83% 45%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    /* Sidebar - Light lavender theme */
+    --sidebar-background: 270 50% 99%;
+    --sidebar-foreground: 240 10% 35%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 50% 96%;
+    --sidebar-accent-foreground: 262 83% 45%;
+    --sidebar-border: 270 20% 92%;
+    --sidebar-ring: 262 83% 58%;
+
+    /* Custom Schools2AI colors */
+    --edtech-pink: 330 80% 85%;
+    --edtech-lavender: 270 60% 90%;
+    --edtech-cyan: 187 80% 85%;
+    --edtech-mint: 160 60% 88%;
+    
+    /* Gradient stops */
+    --gradient-start: 330 80% 90%;
+    --gradient-mid: 270 60% 92%;
+    --gradient-end: 187 70% 90%;
+
+    /* Chart colors */
+    --chart-1: 262 83% 58%;
+    --chart-2: 187 96% 42%;
+    --chart-3: 330 80% 65%;
+    --chart-4: 160 60% 50%;
+    --chart-5: 45 90% 55%;
+  }
+
+  .dark {
+    --background: 240 10% 8%;
+    --foreground: 0 0% 95%;
+
+    --card: 240 10% 12%;
+    --card-foreground: 0 0% 95%;
+
+    --popover: 240 10% 12%;
+    --popover-foreground: 0 0% 95%;
+
+    --primary: 262 83% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 187 80% 50%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 5% 20%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 270 30% 20%;
+    --accent-foreground: 262 83% 75%;
+
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 5% 20%;
+    --input: 240 5% 20%;
+    --ring: 262 83% 65%;
+
+    --sidebar-background: 240 10% 10%;
+    --sidebar-foreground: 240 5% 85%;
+    --sidebar-primary: 262 83% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 270 30% 18%;
+    --sidebar-accent-foreground: 262 83% 75%;
+    --sidebar-border: 240 5% 18%;
+    --sidebar-ring: 262 83% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  /* EdTech gradient backgrounds */
+  .gradient-hero {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--gradient-start)) 0%,
+      hsl(var(--gradient-mid)) 50%,
+      hsl(var(--gradient-end)) 100%
+    );
+  }
+
+  .gradient-primary {
+    background: linear-gradient(
+      135deg,
+      hsl(var(--secondary)) 0%,
+      hsl(var(--primary)) 100%
+    );
+  }
+
+  .gradient-button {
+    background: linear-gradient(
+      90deg,
+      hsl(187 96% 42%) 0%,
+      hsl(262 83% 58%) 100%
+    );
+  }
+
+  .gradient-card {
+    background: linear-gradient(
+      180deg,
+      hsl(0 0% 100%) 0%,
+      hsl(var(--accent)) 100%
+    );
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* EdTech card styles */
+  .edtech-card {
+    @apply bg-card rounded-2xl p-6 shadow-sm border border-border/50;
+    transition: all 0.3s ease;
+  }
+
+  .edtech-card:hover {
+    @apply shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  /* Tool cards */
+  .tool-card {
+    @apply bg-card rounded-xl p-5 border border-border/30 cursor-pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tool-card:hover {
+    @apply shadow-md border-primary/20;
+    transform: translateY(-1px);
+  }
+
+  /* AI Chat bubble */
+  .chat-bubble-user {
+    @apply bg-primary text-primary-foreground rounded-2xl rounded-br-md px-4 py-3;
+  }
+
+  .chat-bubble-ai {
+    @apply bg-accent text-accent-foreground rounded-2xl rounded-bl-md px-4 py-3;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 3px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
+  }
+
+  /* Sidebar link active state */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sidebar-foreground/80 transition-all duration-200;
+  }
+
+  .sidebar-link:hover {
+    @apply bg-sidebar-accent text-sidebar-accent-foreground;
+  }
+
+  .sidebar-link.active {
+    @apply bg-primary/10 text-primary font-medium;
+  }
+
+  /* Input with icon */
+  .input-with-icon {
+    @apply relative;
+  }
+
+  .input-with-icon input {
+    @apply pl-10;
+  }
+
+  .input-with-icon .input-icon {
+    @apply absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground;
+  }
+
+  /* Stats card */
+  .stats-card {
+    @apply flex items-center gap-4 p-4 rounded-xl bg-gradient-to-br from-card to-accent/30 border border-border/30;
+  }
+
+  /* Progress ring animation */
+  @keyframes progress-ring {
+    0% {
+      stroke-dashoffset: 283;
+    }
+  }
+
+  /* Fade in animation */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+
+  /* Slide in from left */
+  @keyframes slide-in-left {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .animate-slide-in-left {
+    animation: slide-in-left 0.3s ease-out forwards;
+  }
+
+  /* Pulse glow animation */
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.5);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Float animation for mascot */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, hsl(187 96% 42%), hsl(262 83% 58%));
+  }
+
+  .shadow-edtech {
+    box-shadow: 0 4px 24px -4px rgba(139, 92, 246, 0.15);
+  }
+
+  .shadow-edtech-lg {
+    box-shadow: 0 8px 32px -8px rgba(139, 92, 246, 0.25);
+  }
+}
