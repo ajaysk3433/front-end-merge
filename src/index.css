@@ -4,7 +4,7 @@
 
 /* Schools2AI Design System - Modern EdTech Theme */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'); */
 
 @layer base {
   :root {
@@ -58,7 +58,7 @@
     --edtech-lavender: 270 60% 90%;
     --edtech-cyan: 187 80% 85%;
     --edtech-mint: 160 60% 88%;
-    
+
     /* Gradient stops */
     --gradient-start: 330 80% 90%;
     --gradient-mid: 270 60% 92%;
@@ -119,11 +119,16 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   }
 }
 
@@ -291,7 +296,8 @@
 
   /* Pulse glow animation */
   @keyframes pulse-glow {
-    0%, 100% {
+    0%,
+    100% {
       box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
     }
     50% {
@@ -305,7 +311,8 @@
 
   /* Float animation for mascot */
   @keyframes float {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0px);
     }
     50% {
@@ -321,7 +328,11 @@
 @layer utilities {
   .text-gradient {
     @apply bg-clip-text text-transparent;
-    background-image: linear-gradient(90deg, hsl(187 96% 42%), hsl(262 83% 58%));
+    background-image: linear-gradient(
+      90deg,
+      hsl(187 96% 42%),
+      hsl(262 83% 58%)
+    );
   }
 
   .shadow-edtech {
