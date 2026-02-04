@@ -33,30 +33,26 @@ const questionTypes = [
 ];
 
 export default function AIPracticePage() {
-  const [step, setStep] = useState<
-    "setup" | "SA" | "LA" | "PYQ" | "PQ" | "MCQ"
-  >("setup");
-  const [selectedChapters, setSelectedChapters] = useState<string[]>([]);
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [step, setStep] = useState("setup");
+  const [selectedChapters, setSelectedChapters] = useState([]);
+  const [selectedTypes, setSelectedTypes] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedClass, setSelectedClass] = useState("10");
   const [selectedLanguage, setSelectedLanguage] = useState("english");
   const [selectedSubject, setSelectedSubject] = useState("mathematics");
   const [examData, setExamData] = useState({});
   const [loading, setLoading] = useState(false);
-  // Stores number of questions for each selected type
-  const [questionConfig, setQuestionConfig] = useState<Record<string, number>>(
-    {},
-  );
 
-  const updateQuestionCount = (typeId: string, value: number) => {
+  const [questionConfig, setQuestionConfig] = useState({});
+
+  const updateQuestionCount = (typeId, value) => {
     setQuestionConfig((prev) => ({
       ...prev,
       [typeId]: value,
     }));
   };
 
-  const toggleChapter = (chapter: string) => {
+  const toggleChapter = (chapter) => {
     setSelectedChapters((prev) =>
       prev.includes(chapter)
         ? prev.filter((c) => c !== chapter)
@@ -64,30 +60,31 @@ export default function AIPracticePage() {
     );
   };
 
-  const toggleType = (type: string) => {
+  const toggleType = (type) => {
     setSelectedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [type],
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
 
   const handleGenerateExam = async () => {
-    // For simplicity, pick the first selected chapter & type
     const data = {
       subject:
         selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1),
-      chapter: selectedChapters[0] || "",
-      questionType: selectedTypes[0]?.toUpperCase() || "", // convert to format like "MCQ"
+      // chapter: selectedChapters[0] || "",
+      chapter: selectedChapters,
+      // questionType: selectedTypes[0]?.toUpperCase() || "",
+      questionType: selectedTypes.map((type) => type.toUpperCase()),
       class_: Number(selectedClass),
       language:
         selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1),
-      questionsCount:
-        questionConfig[selectedTypes[0]?.toLowerCase() ?? ""] ?? 1,
+      // questionsCount:
+      //   questionConfig[selectedTypes[0]?.toLowerCase() ?? ""] ?? 1,
+      questionsCount: questionConfig,
     };
 
     console.log("Generated Exam Data:", data);
     setLoading(true);
 
-    // setStep("exam");
     try {
       const res = await fetch("http://localhost:3000/gini/practice/questions", {
         method: "POST",
@@ -101,12 +98,11 @@ export default function AIPracticePage() {
         setStep(data.questionType);
         console.log(data);
       }
-    } catch (error) {}
-
-    // setStep("exam");
+    } catch (error) {
+      setLoading(false);
+      console.error(error);
+    }
   };
-
-  //  "exam" JSX
 
   if (step === "SA" || step === "LA" || step === "PYQ" || step === "PQ") {
     return (
@@ -127,9 +123,13 @@ export default function AIPracticePage() {
       />
     );
   }
+
   if (loading) {
     return <LoadingScreen />;
   }
+
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - i - 1);
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
@@ -239,7 +239,6 @@ export default function AIPracticePage() {
 
                 return (
                   <div key={type.id} className="space-y-1">
-                    {/* Checkbox and label */}
                     <div className="flex items-center">
                       <Checkbox
                         checked={isSelected}
@@ -248,22 +247,84 @@ export default function AIPracticePage() {
                       <span className="ml-2 text-sm">{type.label}</span>
                     </div>
 
-                    {/* Number of questions below */}
-                    {isSelected && type.id !== "pyq" && type.id !== "pq" && (
+                    {isSelected && type.id !== "pq" && (
                       <div className="ml-6 flex items-center gap-2">
-                        <span className="text-xs text-muted-foreground">
-                          No. of questions:
-                        </span>
-                        <input
-                          type="number"
-                          min={1}
-                          max={100}
-                          value={questionConfig[type.id] ?? 1}
-                          onChange={(e) =>
-                            updateQuestionCount(type.id, Number(e.target.value))
-                          }
-                          className="w-20 px-2 py-1 border rounded-md text-sm"
-                        />
+                        {type.id === "pyq" ? (
+                          <>
+                            <span className="text-xs text-muted-foreground">
+                              Select year range:
+                            </span>
+
+                            <div className="flex gap-2">
+                              <select
+                                value={questionConfig[type.id]?.from ?? ""}
+                                onChange={(e) =>
+                                  updateQuestionCount(type.id, {
+                                    ...questionConfig[type.id],
+                                    from: Number(e.target.value),
+                                    to: "",
+                                  })
+                                }
+                                className="w-24 px-2 py-1 border rounded-md text-sm"
+                              >
+                                <option value="" disabled>
+                                  From
+                                </option>
+                                {years.map((year) => (
+                                  <option key={year} value={year}>
+                                    {year}
+                                  </option>
+                                ))}
+                              </select>
+
+                              <select
+                                value={questionConfig[type.id]?.to ?? ""}
+                                onChange={(e) =>
+                                  updateQuestionCount(type.id, {
+                                    ...questionConfig[type.id],
+                                    to: Number(e.target.value),
+                                  })
+                                }
+                                className="w-24 px-2 py-1 border rounded-md text-sm"
+                                disabled={!questionConfig[type.id]?.from}
+                              >
+                                <option value="" disabled>
+                                  To
+                                </option>
+                                {years
+                                  .filter(
+                                    (year) =>
+                                      !questionConfig[type.id]?.from ||
+                                      year >= questionConfig[type.id].from,
+                                  )
+                                  .map((year) => (
+                                    <option key={year} value={year}>
+                                      {year}
+                                    </option>
+                                  ))}
+                              </select>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs text-muted-foreground">
+                              No. of questions:
+                            </span>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={questionConfig[type.id] ?? 0}
+                              onChange={(e) =>
+                                updateQuestionCount(
+                                  type.id,
+                                  Number(e.target.value),
+                                )
+                              }
+                              className="w-20 px-2 py-1 border rounded-md text-sm"
+                            />
+                          </>
+                        )}
                       </div>
                     )}
                   </div>
@@ -317,7 +378,10 @@ export default function AIPracticePage() {
                 className="w-full gradient-button mt-4"
                 onClick={handleGenerateExam}
                 disabled={
-                  selectedChapters.length === 0 || selectedTypes.length === 0
+                  selectedChapters.length === 0 || // no chapters
+                  selectedTypes.length === 0 || // no question types
+                  (selectedTypes.includes("pyq") &&
+                    (!questionConfig.pyq?.from || !questionConfig.pyq?.to)) // pyq selected but from/to not defined
                 }
               >
                 <ClipboardList className="w-4 h-4 mr-2" />
