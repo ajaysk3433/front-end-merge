@@ -16,6 +16,7 @@ import MoreToolsPage from "./pages/MoreToolsPage";
 import ProfilePage from "./pages/ProfilePage";
 import SupportPage from "./pages/SupportPage";
 import NotFound from "./pages/NotFound";
+import QuestionBankPage from "./pages/QuestionBankPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
                   <Route path="/summarizer" element={<SummarizerPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/more-tools" element={<MoreToolsPage />} />
+                  <Route path="/question-bank" element={<QuestionBankPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/new-course" element={<HomePage />} />
                   <Route path="/history" element={<HistoryPage />} />
