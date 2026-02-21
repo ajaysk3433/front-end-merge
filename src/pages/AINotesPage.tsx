@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FileText,
   Download,
@@ -18,20 +18,99 @@ import {
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-const chapters = [
-  "1 Real Numbers",
-  "2 Polynomials",
-  "3 Pair of Linear Equations",
-  "4 Quadratic Equations",
-  "5 Arithmetic Progressions",
-  "6 Triangles",
-  "7 Coordinate Geometry",
-  "8 Introduction to Trigonometry",
-];
+interface AINote {
+  topic: string;
+  short_notes: string;
+  full_notes: string;
+}
 
 export default function AINotesPage() {
+  // ===============================
+  // BACKEND DATA STATES
+  // ===============================
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [classes, setClasses] = useState<string[]>([]);
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [chapters, setChapters] = useState<string[]>([]);
+
+  // ===============================
+  // SELECTED VALUES (UI)
+  // ===============================
+  const [language, setLanguage] = useState("English");
+  const [className, setClassName] = useState("10");
+  const [subject, setSubject] = useState("Mathematics");
   const [selectedChapter, setSelectedChapter] = useState<string | null>(null);
+
+  // ===============================
+  // NOTES STATE
+  // ===============================
+  const [note, setNote] = useState<AINote | null>(null);
   const [showNotes, setShowNotes] = useState(false);
+
+  // ===============================
+  // RESET NOTES (LOGIC ONLY)
+  // ===============================
+  const resetNotes = () => {
+    setShowNotes(false);
+    setNote(null);
+  };
+
+  // ===============================
+  // FETCH LANGUAGES
+  // ===============================
+  useEffect(() => {
+    fetch("http://localhost:5000/api/ainote/languages")
+      .then(res => res.json())
+      .then(data => setLanguages(data.data || []));
+  }, []);
+
+  // ===============================
+  // FETCH CLASSES
+  // ===============================
+  useEffect(() => {
+    fetch(
+      `http://localhost:5000/api/ainote/classes?language=${language}&board=CBSE`
+    )
+      .then(res => res.json())
+      .then(data => setClasses(data.data || []));
+  }, [language]);
+
+  // ===============================
+  // FETCH SUBJECTS
+  // ===============================
+  useEffect(() => {
+    fetch(
+      `http://localhost:5000/api/ainote/subjects?language=${language}&class=${className}`
+    )
+      .then(res => res.json())
+      .then(data => setSubjects(data.data || []));
+  }, [language, className]);
+
+  // ===============================
+  // FETCH CHAPTERS
+  // ===============================
+  useEffect(() => {
+    fetch(
+      `http://localhost:5000/api/ainote/chapters?language=${language}&class=${className}&subject=${subject}`
+    )
+      .then(res => res.json())
+      .then(data => setChapters(data.data || []));
+  }, [language, className, subject]);
+
+  // ===============================
+  // GENERATE NOTES
+  // ===============================
+  const handleGenerateNotes = async () => {
+    if (!selectedChapter) return;
+
+    const res = await fetch(
+      `http://localhost:5000/api/ainote?language=${language}&board=CBSE&class=${className}&subject=${subject}&topic=${selectedChapter}`
+    );
+
+    const data = await res.json();
+    setNote(data.data?.[0]);
+    setShowNotes(true);
+  };
 
   return (
     <div className="min-h-screen p-6 lg:p-8">
@@ -66,64 +145,101 @@ export default function AINotesPage() {
         {/* Filters */}
         <div className="edtech-card mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Language */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Language
               </label>
-              <Select defaultValue="english">
+              <Select
+                value={language}
+                onValueChange={(val) => {
+                  setLanguage(val);
+                  resetNotes();
+                  setSelectedChapter(null);
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="english">English</SelectItem>
-                  <SelectItem value="hindi">Hindi</SelectItem>
+                  {languages.map(l => (
+                    <SelectItem key={l} value={l}>
+                      {l}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Class */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Class
               </label>
-              <Select defaultValue="10">
+              <Select
+                value={className}
+                onValueChange={(val) => {
+                  setClassName(val);
+                  resetNotes();
+                  setSelectedChapter(null);
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="9">Class 9</SelectItem>
-                  <SelectItem value="10">Class 10</SelectItem>
-                  <SelectItem value="11">Class 11</SelectItem>
-                  <SelectItem value="12">Class 12</SelectItem>
+                  {classes.map(c => (
+                    <SelectItem key={c} value={c}>
+                      Class {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Subject */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Subject
               </label>
-              <Select defaultValue="mathematics">
+              <Select
+                value={subject}
+                onValueChange={(val) => {
+                  setSubject(val);
+                  resetNotes();
+                  setSelectedChapter(null);
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select subject" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="mathematics">Mathematics</SelectItem>
-                  <SelectItem value="science">Science</SelectItem>
-                  <SelectItem value="english">English</SelectItem>
+                  {subjects.map(s => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
+
+            {/* Chapter */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Chapter
               </label>
               <Select
                 value={selectedChapter || ""}
-                onValueChange={setSelectedChapter}
+                onValueChange={(val) => {
+                  setSelectedChapter(val);
+                  resetNotes();
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select chapter" />
                 </SelectTrigger>
                 <SelectContent>
-                  {chapters.map((chapter) => (
+                  {chapters.map(chapter => (
                     <SelectItem key={chapter} value={chapter}>
                       {chapter}
                     </SelectItem>
@@ -147,7 +263,10 @@ export default function AINotesPage() {
                 {chapters.map((chapter) => (
                   <button
                     key={chapter}
-                    onClick={() => setSelectedChapter(chapter)}
+                    onClick={() => {
+                      setSelectedChapter(chapter);
+                      resetNotes();
+                    }}
                     className={`w-full flex items-center justify-between p-3 rounded-lg text-left text-sm transition-colors ${
                       selectedChapter === chapter
                         ? "bg-primary/10 text-primary font-medium"
@@ -170,16 +289,17 @@ export default function AINotesPage() {
 
           {/* Notes content */}
           <div className="lg:col-span-2">
-            {showNotes ? (
+            {showNotes && note ? (
+              /* ===== ORIGINAL NOTES UI (UNCHANGED) ===== */
               <div className="edtech-card">
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="font-display text-xl font-semibold text-foreground">
-                      Real Numbers - CBSE Class 10 Maths
+                      {note.topic} - CBSE Class {className} {subject}
                     </h2>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    {/* <p className="text-sm text-muted-foreground mt-1">
                       6 marks info
-                    </p>
+                    </p> */}
                   </div>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm">
@@ -193,64 +313,55 @@ export default function AINotesPage() {
                   </div>
                 </div>
 
-                <div className="prose prose-sm max-w-none">
-                  <h3>Study Guide: Real Numbers</h3>
-                  <p>
-                    Real Numbers is a fundamental topic in mathematics that
-                    forms the foundation for advanced concepts. This chapter
-                    covers rational and irrational numbers, the Fundamental
-                    Theorem of Arithmetic, and methods to find HCF and LCM.
-                  </p>
+                {/* <div className="prose prose-sm max-w-none">
+                  <h3>Study Guide: {note.topic}</h3>
+                  <p>{note.short_notes}</p>
 
-                  <h4>Key Concepts:</h4>
-                  <ul>
-                    <li>
-                      <strong>Euclid's Division Lemma:</strong> For positive
-                      integers a and b, there exist unique integers q and r
-                      such that a = bq + r, where 0 ≤ r &lt; b.
-                    </li>
-                    <li>
-                      <strong>Fundamental Theorem of Arithmetic:</strong> Every
-                      composite number can be expressed as a product of primes
-                      uniquely.
-                    </li>
-                    <li>
-                      <strong>Irrational Numbers:</strong> Numbers that cannot
-                      be expressed as p/q where p and q are integers and q ≠ 0.
-                    </li>
-                  </ul>
+                  <h4>Detailed Notes</h4>
+                  <p>{note.full_notes}</p>
+                </div> */}
+                <div className="space-y-6 text-sm leading-relaxed">
+                  {note.short_notes
+                    .replace(/\\n/g, "\n")
+                    .replace(/^\)\s*/, "")
+                    .replace(/---.*/g, "")
+                    .split(/\n(?=\d+\.\s)/)
+                    .map((section, index) => {
+                      const lines = section.split("\n");
+                      const title = lines[0];
+                      const content = lines.slice(1);
 
-                  <h4>Important Formulas:</h4>
-                  <ul>
-                    <li>HCF × LCM = Product of two numbers</li>
-                    <li>For prime factorization: n = p₁^a × p₂^b × ...</li>
-                  </ul>
-                </div>
+                      return (
+                        <div key={index}>
+                          <h3 className="text-lg font-semibold text-foreground mb-2">
+                            {title}
+                          </h3>
 
-                <div className="mt-6 p-4 rounded-lg bg-accent/50">
-                  <h4 className="font-semibold text-foreground mb-2">
-                    Quick Navigation
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "1 Numbers",
-                      "2 Polynomials",
-                      "3 Pair of Linear Equations",
-                      "5 Arithmetic Progressions",
-                      "6 Triangles",
-                      "7 Coordinate Geometry",
-                    ].map((item) => (
-                      <span
-                        key={item}
-                        className="text-sm text-primary hover:underline cursor-pointer"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
+                          <div className="space-y-2 text-muted-foreground">
+                            {content.map((line, i) => {
+                              if (line.trim().startsWith("-")) {
+                                return (
+                                  <div key={i} className="flex gap-2">
+                                    <span>•</span>
+                                    <span>{line.replace("-", "").trim()}</span>
+                                  </div>
+                                );
+                              }
+
+                              return (
+                                <p key={i}>
+                                  {line.trim()}
+                                </p>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             ) : (
+              /* ===== ORIGINAL EMPTY STATE UI (UNCHANGED) ===== */
               <div className="edtech-card text-center py-16">
                 <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-accent flex items-center justify-center">
                   <FileText className="w-10 h-10 text-primary" />
@@ -263,7 +374,7 @@ export default function AINotesPage() {
                   study notes with key concepts and summaries.
                 </p>
                 <Button
-                  onClick={() => setShowNotes(true)}
+                  onClick={handleGenerateNotes}
                   className="gradient-button"
                   disabled={!selectedChapter}
                 >
