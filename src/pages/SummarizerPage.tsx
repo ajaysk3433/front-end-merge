@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { config } from "../../app.config.js";
 
 export default function SummarizerPage() {
   // -----------------------------
@@ -52,7 +53,7 @@ export default function SummarizerPage() {
       }
 
       // backend API call
-      const res = await fetch("http://localhost:5000/api/summarize", {
+      const res = await fetch(`${config.server}/api/summarize`, {
         method: "POST",
         body: formData,
       });
