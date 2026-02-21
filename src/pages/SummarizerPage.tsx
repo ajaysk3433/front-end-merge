@@ -10,14 +10,70 @@ import {
 } from "@/components/ui/select";
 
 export default function SummarizerPage() {
+  // -----------------------------
+  // STATE (NO UI CHANGE)
+  // -----------------------------
   const [file, setFile] = useState<File | null>(null);
+  const [summary, setSummary] = useState<string>(""); // backend summary
+  const [loading, setLoading] = useState(false);      // API loading
+  const [error, setError] = useState<string>("");     // backend error
   const [showSummary, setShowSummary] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null); // AI session
 
+  // -----------------------------
+  // DRAG & DROP (UNCHANGED)
+  // -----------------------------
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const droppedFile = e.dataTransfer.files[0];
     if (droppedFile) {
       setFile(droppedFile);
+    }
+  };
+
+  // -----------------------------
+  // 🔥 BACKEND INTEGRATION
+  // -----------------------------
+  const handleSummarize = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    setError("");
+
+    try {
+      // FormData is REQUIRED for file upload
+      const formData = new FormData();
+      formData.append("file", file); // multer expects "file"
+      formData.append("ai_feature", "AI_SUMMARIZER");
+
+      // continue same AI session if exists
+      if (conversationId) {
+        formData.append("conversation_id", conversationId);
+      }
+
+      // backend API call
+      const res = await fetch("http://localhost:5000/api/summarize", {
+        method: "POST",
+        body: formData,
+      });
+
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Summarization failed");
+      }
+
+      // save backend response
+      setSummary(data.summary);
+      setConversationId(data.conversation_id);
+
+      // switch UI to summary view
+      setShowSummary(true);
+    } catch (err: Error | unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -86,10 +142,11 @@ export default function SummarizerPage() {
                     </Button>
                     <Button
                       className="gradient-button"
-                      onClick={() => setShowSummary(true)}
+                      onClick={handleSummarize}   // 🔥 backend call
+                      disabled={loading}
                     >
                       <Sparkles className="w-4 h-4 mr-2" />
-                      Summarize
+                      {loading ? "Summarizing..." : "Summarize"}
                     </Button>
                   </div>
                 </div>
@@ -130,6 +187,13 @@ export default function SummarizerPage() {
                 </>
               )}
             </div>
+
+            {/* backend error */}
+            {error && (
+              <p className="text-red-500 text-sm mt-4 text-center">
+                {error}
+              </p>
+            )}
           </div>
         ) : (
           <div className="edtech-card animate-fade-in">
@@ -139,7 +203,7 @@ export default function SummarizerPage() {
                   Document Summary
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  Generated in 12 seconds
+                  Generated just now
                 </p>
               </div>
               <div className="flex gap-2">
@@ -154,55 +218,21 @@ export default function SummarizerPage() {
               </div>
             </div>
 
-            <div className="prose prose-sm max-w-none">
-              <h3>Key Points Summary</h3>
-              <ul>
-                <li>
-                  <strong>Main Topic:</strong> Introduction to Number Systems
-                  and their properties
-                </li>
-                <li>
-                  <strong>Key Concepts:</strong> Real numbers, rational numbers,
-                  irrational numbers, and their representations
-                </li>
-                <li>
-                  <strong>Important Theorems:</strong> Euclid's Division Lemma,
-                  Fundamental Theorem of Arithmetic
-                </li>
-              </ul>
-
-              <h3>Detailed Summary</h3>
-              <p>
-                This document covers the foundational concepts of number systems
-                in mathematics. It begins with an exploration of natural numbers
-                and extends to the complete set of real numbers.
-              </p>
-
-              <h4>Section 1: Number Classification</h4>
-              <p>
-                Numbers are classified into various categories including natural
-                numbers, whole numbers, integers, rational numbers, and
-                irrational numbers. Each category has specific properties and
-                applications.
-              </p>
-
-              <h4>Section 2: Properties of Real Numbers</h4>
-              <p>
-                Real numbers follow commutative, associative, and distributive
-                properties. These properties are essential for algebraic
-                manipulations and problem-solving.
-              </p>
-
-              <h4>Study Tips</h4>
-              <ul>
-                <li>Practice identifying number types from examples</li>
-                <li>Memorize key theorems and their applications</li>
-                <li>Solve previous year questions for better understanding</li>
-              </ul>
+            {/* 🔥 REAL AI SUMMARY */}
+            <div className="prose prose-sm max-w-none whitespace-pre-wrap">
+              {summary}
             </div>
 
             <div className="mt-6 flex gap-3">
-              <Button variant="outline" onClick={() => setShowSummary(false)}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowSummary(false);
+                  setFile(null);
+                  setSummary("");
+                  setConversationId(null); // new session
+                }}
+              >
                 Summarize Another
               </Button>
               <Button className="gradient-button">
