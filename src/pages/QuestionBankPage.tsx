@@ -83,7 +83,6 @@ const predictedQuestions = [
 ];
 
 export default function QuestionBankPage() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedClass, setSelectedClass] = useState("all");
   const [selectedYear, setSelectedYear] = useState("2025");
@@ -128,7 +127,7 @@ export default function QuestionBankPage() {
     try {
       const queryParams = new URLSearchParams({
         board: "CBSE", // static or from state if you have it
-        year: selectedYear,
+        // year: selectedYear,
         className: selectedClass,
         subject: selectedSubject,
       });
@@ -218,7 +217,14 @@ export default function QuestionBankPage() {
                 <SelectItem value="12">12th Grade</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="ml-auto" onClick={PYQ} size="lg">
+            <Button
+              className="ml-auto"
+              onClick={() => {
+                PYQ();
+                getPredictQuestions();
+              }}
+              size="lg"
+            >
               Search
             </Button>
           </div>
@@ -277,7 +283,7 @@ export default function QuestionBankPage() {
                         size="sm"
                         onClick={() =>
                           window.open(
-                            `${config.server}/pyq/pre/{q.filePath}`,
+                            `${config.server}/pyq/${q.filePath}`,
                             "_blank",
                           )
                         }
@@ -314,7 +320,8 @@ export default function QuestionBankPage() {
                 </p>
               </div>
             </div>
-            {previousYearQuestions
+            {predictQuestions
+
               // .filter((q) =>
               //   q.question.toLowerCase().includes(searchQuery.toLowerCase()),
               // )
@@ -327,9 +334,9 @@ export default function QuestionBankPage() {
                     {/* Left Section */}
                     <div className="flex flex-col gap-2">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <Badge variant="outline" className="text-xs">
+                        {/* <Badge variant="outline" className="text-xs">
                           {q.year}
-                        </Badge>
+                        </Badge> */}
                         <Badge variant="secondary" className="text-xs">
                           {q.subject}
                         </Badge>
@@ -341,10 +348,30 @@ export default function QuestionBankPage() {
 
                     {/* Right Section - Actions */}
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          window.open(
+                            `${config.server}/predict/${q.filePath}`,
+                            "_blank",
+                          )
+                        }
+                      >
                         Preview
                       </Button>
-                      <Button size="sm">Download</Button>
+
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          window.open(
+                            `${config.server}/predict/papers/download?filePath=${encodeURIComponent(q.filePath)}`,
+                            "_blank",
+                          )
+                        }
+                      >
+                        Download
+                      </Button>
                     </div>
                   </div>
                 </div>
