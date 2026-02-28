@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { config } from "../../app.config.js";
 
 interface AINote {
   topic: string;
@@ -59,7 +60,7 @@ export default function AINotesPage() {
   // FETCH LANGUAGES
   // ===============================
   useEffect(() => {
-    fetch("http://localhost:5000/api/ainote/languages")
+    fetch(`${config.server}/api/ainote/languages`)
       .then(res => res.json())
       .then(data => setLanguages(data.data || []));
   }, []);
@@ -69,7 +70,7 @@ export default function AINotesPage() {
   // ===============================
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/ainote/classes?language=${language}&board=CBSE`
+      `${config.server}/api/ainote/classes?language=${language}&board=CBSE`
     )
       .then(res => res.json())
       .then(data => setClasses(data.data || []));
@@ -80,7 +81,7 @@ export default function AINotesPage() {
   // ===============================
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/ainote/subjects?language=${language}&class=${className}`
+      `${config.server}/api/ainote/subjects?language=${language}&class=${className}`
     )
       .then(res => res.json())
       .then(data => setSubjects(data.data || []));
@@ -91,7 +92,7 @@ export default function AINotesPage() {
   // ===============================
   useEffect(() => {
     fetch(
-      `http://localhost:5000/api/ainote/chapters?language=${language}&class=${className}&subject=${subject}`
+      `${config.server}/api/ainote/chapters?language=${language}&class=${className}&subject=${subject}`
     )
       .then(res => res.json())
       .then(data => setChapters(data.data || []));
@@ -104,7 +105,7 @@ export default function AINotesPage() {
     if (!selectedChapter) return;
 
     const res = await fetch(
-      `http://localhost:5000/api/ainote?language=${language}&board=CBSE&class=${className}&subject=${subject}&topic=${selectedChapter}`
+      `${config.server}/api/ainote?language=${language}&board=CBSE&class=${className}&subject=${subject}&topic=${selectedChapter}`
     );
 
     const data = await res.json();
