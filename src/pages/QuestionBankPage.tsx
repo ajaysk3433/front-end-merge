@@ -24,64 +24,6 @@ import { Badge } from "@/components/ui/badge";
 
 import { config } from "../../app.config.js";
 
-const predictedQuestions = [
-  {
-    id: 1,
-    subject: "Mathematics",
-    chapter: "Coordinate Geometry",
-    question:
-      "Find the area of the triangle formed by the points (2, 3), (−1, 0), and (2, −4).",
-    marks: 3,
-    type: "Long Answer",
-    difficulty: "Medium",
-    confidence: 85,
-  },
-  {
-    id: 2,
-    subject: "Mathematics",
-    chapter: "Real Numbers",
-    question:
-      "Find the LCM and HCF of 306 and 657 and verify that LCM × HCF = product of the two numbers.",
-    marks: 3,
-    type: "Long Answer",
-    difficulty: "Medium",
-    confidence: 92,
-  },
-  {
-    id: 3,
-    subject: "Mathematics",
-    chapter: "Statistics",
-    question:
-      "The following distribution gives the daily income of 50 workers. Find the mean daily income.",
-    marks: 5,
-    type: "Long Answer",
-    difficulty: "Hard",
-    confidence: 78,
-  },
-  {
-    id: 4,
-    subject: "Mathematics",
-    chapter: "Polynomials",
-    question:
-      "If one zero of the polynomial 3x² − 8x + 2k + 1 is seven times the other, find the value of k.",
-    marks: 2,
-    type: "Short Answer",
-    difficulty: "Medium",
-    confidence: 88,
-  },
-  {
-    id: 5,
-    subject: "Mathematics",
-    chapter: "Quadratic Equations",
-    question:
-      "A train travels 360 km at a uniform speed. If the speed had been 5 km/h more, it would have taken 1 hour less. Find the speed.",
-    marks: 5,
-    type: "Long Answer",
-    difficulty: "Hard",
-    confidence: 74,
-  },
-];
-
 export default function QuestionBankPage() {
   const [selectedSubject, setSelectedSubject] = useState("all");
   const [selectedClass, setSelectedClass] = useState("all");

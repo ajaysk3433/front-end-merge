@@ -26,18 +26,27 @@ import heroBg from "@/assets/hero-bg.jpg";
 import { FC, ChangeEvent, useEffect, useRef, useState } from "react";
 import RecentsSection from "./components/AIPracticePage/RecentsSection";
 
+/**
+ * Interface representing a single chat message.
+ */
 interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
 }
 
+/**
+ * Interface for tracking the feedback state of a specific message.
+ */
 interface MessageFeedbackState {
   rating: "up" | "down" | null;
   comment: string;
   submitted: boolean;
 }
 
+/**
+ * Hero section of the AI Gini page, featuring the main title and quick access tools.
+ */
 const HeroSection = () => (
   <section
     className="relative h-screen py-12 px-6 lg:px-12 overflow-hidden"
@@ -69,6 +78,9 @@ const HeroSection = () => (
   </section>
 );
 
+/**
+ * Props for the WelcomeScreen component.
+ */
 interface WelcomeScreenProps {
   input: string;
   setInput: (value: string) => void;
@@ -78,6 +90,9 @@ interface WelcomeScreenProps {
   uploadedFile: File | null;
 }
 
+/**
+ * Initial screen shown before any messages are sent, providing input for questions and file uploads.
+ */
 const WelcomeScreen: FC<WelcomeScreenProps> = ({
   input,
   setInput,
@@ -155,6 +170,9 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({
   </div>
 );
 
+/**
+ * Props for the ChatView component.
+ */
 interface ChatViewProps {
   messages: Message[];
   isLoading: boolean;
@@ -166,6 +184,9 @@ interface ChatViewProps {
   resetChat: () => void;
 }
 
+/**
+ * Component that displays the conversation history and feedback mechanisms.
+ */
 const ChatView: FC<ChatViewProps> = ({
   messages,
   isLoading,
@@ -186,6 +207,9 @@ const ChatView: FC<ChatViewProps> = ({
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
+  /**
+   * Helper to retrieve the user's message and the corresponding AI assistant response.
+   */
   const getUserMessageAndResponse = (assistantMessageId: string) => {
     const idx = messages.findIndex((m) => m.id === assistantMessageId);
 
@@ -200,6 +224,9 @@ const ChatView: FC<ChatViewProps> = ({
     };
   };
 
+  /**
+   * Handles clicking thumbs up/down for a message.
+   */
   const handleThumbClick = async (messageId: string, rating: "up" | "down") => {
     const pair = getUserMessageAndResponse(messageId);
 
@@ -235,6 +262,9 @@ const ChatView: FC<ChatViewProps> = ({
     }
   };
 
+  /**
+   * Updates the feedback comment for a specific message.
+   */
   const handleFeedbackChange = (messageId: string, value: string) => {
     setFeedbackByMessageId((prev) => ({
       ...prev,
@@ -246,6 +276,9 @@ const ChatView: FC<ChatViewProps> = ({
     }));
   };
 
+  /**
+   * Submits detailed feedback for a message.
+   */
   const handleSubmitFeedback = async (messageId: string) => {
     const pair = getUserMessageAndResponse(messageId);
     const feedback = feedbackByMessageId[messageId]?.comment ?? "";
@@ -444,6 +477,9 @@ const ChatView: FC<ChatViewProps> = ({
   );
 };
 
+/**
+ * Container component for the AI Gini chat, toggling between the welcome screen and chat view.
+ */
 const ChatBox = () => {
   const {
     messages,
@@ -486,6 +522,9 @@ const ChatBox = () => {
   );
 };
 
+/**
+ * The main page component for AI Gini, featuring a personalized AI tutor interface.
+ */
 export default function AIGiniPage() {
   return (
     <div className="min-h-screen flex flex-col">

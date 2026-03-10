@@ -1,6 +1,9 @@
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
+/**
+ * Interface representing a single chat message.
+ */
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -9,8 +12,17 @@ interface Message {
 
 import { config } from "../../app.config.js";
 
+/**
+ * Endpoint for the AI Gini chat service.
+ */
 const CHAT_URL = `${config.server}/gini/ai/gini`;
 
+/**
+ * A custom hook to manage chat state and interactions with the AI assistant.
+ * Handles message history, user input, file uploads, and streaming AI responses.
+ * 
+ * @returns {Object} Chat state and handler functions.
+ */
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -20,6 +32,10 @@ export const useChat = () => {
 
   const { toast } = useToast();
 
+  /**
+   * Sends the current user input and any uploaded file to the AI assistant.
+   * Manages streaming the response and updating the message history.
+   */
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -123,6 +139,12 @@ export const useChat = () => {
     }
   };
 
+  /**
+   * Handles file selection from an input element.
+   * Updates state and adds a placeholder message for the upload to the chat.
+   * 
+   * @param {React.ChangeEvent<HTMLInputElement>} e - The change event from the file input.
+   */
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (!file) return;
@@ -140,6 +162,9 @@ export const useChat = () => {
     setMessages((prev) => [...prev, fileMessage]);
   };
 
+  /**
+   * Resets the chat history and clears any uploaded files.
+   */
   const resetChat = () => {
     setMessages([]);
     setUploadedFile(null);
